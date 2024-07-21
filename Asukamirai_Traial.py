@@ -59,10 +59,20 @@ def gamestage():
     ##弾の処理
     ##手順①
 
-
+    if mdown[0] and bulletrect.y < 0:
+        asuka.bullet(bulletrect,myrect)
+    if bulletrect.y >= 0:
+        asuka.bulletAftter(bulletimg,bulletrect,myrect,screen)
 
     ##敵の処理
     ##手順②
+    for emy in emyos:
+        emy.y += 10
+        screen.blit(ufoimg,emy)
+        if emy.colliderect(myrect):
+            page = 2
+        score = asuka.ufodisplay(emy,myrect,bulletrect,score,page)
+
 
 
     ##スコア処理
