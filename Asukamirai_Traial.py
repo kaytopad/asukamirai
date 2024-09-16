@@ -96,7 +96,7 @@ def gameover():
     font = pg.font.Font(None,150)
     text = font.render("GAMEOVER",True,pg.Color("RED"))
     screen.blit(text,(100,200))
-    btn1 = screen.blit(replay_img,(320,400))
+    btn1 = screen.blit(replay_img,(360,400))
     font = pg.font.Font(None,40)
     text = font.render("SCORE : "+str(score),True,pg.Color("WHITE"))
     screen.blit(text,(20,20))
