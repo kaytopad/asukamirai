@@ -1,4 +1,4 @@
-import pygame as pg,sys
+import pygame as pg
 
 class Player:
     def __init__(self,img_path,sceen_width):

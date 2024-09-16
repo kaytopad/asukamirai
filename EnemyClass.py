@@ -1,4 +1,4 @@
-import pygame as pg,sys
+import pygame as pg
 import random
 
 class Enemy:

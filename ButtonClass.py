@@ -1,4 +1,4 @@
-import pygame as pg,sys
+import pygame as pg
 
 class Button:
     def __init__(self,img_path,position):

@@ -1,4 +1,4 @@
-import pygame as pg,sys
+import pygame as pg
 
 class Bullet:
     def __init__(self,img_path):
