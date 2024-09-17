@@ -5,5 +5,5 @@ pg.init()
 screen = pg.display.set_mode((800, 600))
 
 if __name__ == "__main__":
-    game = Game()
-    game.run(screen)
+    game = Game(screen)
+    game.run()
