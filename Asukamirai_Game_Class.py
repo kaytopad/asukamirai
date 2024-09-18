@@ -51,10 +51,10 @@ class Game:
 
     #GameOverメソッド
     def game_ovre(self):
-        self.score.fill(pg.Color("NAVY"))
+        self.screen.fill(pg.Color("NAVY"))
         font = pg.font.Font(None, 150)
         text = font.render("GAMEOVER", True, pg.Color("RED"))
-        self.score.blit(text, (100, 200))
+        self.screen.blit(text, (100, 200))
 
         self.replay_button.draw(self.screen)
 
@@ -86,5 +86,5 @@ class Game:
             if self.page == 1:
                 self.game_stage()
             elif self.page == 2:
-                self.game_over()
+                self.game_ovre()
 
