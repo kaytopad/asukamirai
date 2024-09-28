@@ -1,5 +1,6 @@
 import pygame as pg
 import sys
+import random
 from PlayerClass import Player
 from EnemyClass import Enemy
 from ButtonClass import Button
@@ -9,14 +10,18 @@ class Game:
     def __init__(self, screen):
         self.screen = screen
         self.page = 1
+        self.push_flag = False
         self.score = 0
         self.player = Player("./image/Renjer(Blue).png", 800)
+        self.bullet = Bullet("./image/mybullet.tga")
         self.enemy = Enemy("./image/enemy1.tga")
         self.replay_button = Button("./image/btn006_08.gif", (360, 400))
-        self.bullets = []  # 弾を格納するリスト
-        self.bullet_img_path = "./image/mybullet.tga"  # 弾の画像パス
-        self.last_shot_time = 0  # 最後に弾を撃った時間
-        self.shoot_interval = 300  # 連射の間隔（ミリ秒）
+        self.bullets = []
+        self.enemy_spawn_timer = 0  # 敵を生成するタイマー
+        self.enemy_spawn_interval = 2000  # 敵の生成間隔（2000ミリ秒 = 2秒）
+        self.max_enemies = 5  # 最大の敵の数
+        self.last_shot_time = 0  # 最後に弾を発射した時間
+        self.shot_interval = 500  # 弾を発射する間隔（500ミリ秒 = 0.5秒）
 
     def handle_events(self):
         for event in pg.event.get():
@@ -26,57 +31,53 @@ class Game:
 
     def game_stage(self):
         self.screen.fill(pg.Color("BLACK"))
-        keys = pg.key.get_pressed()  # 現在のキーボード入力を取得
+        keys = pg.key.get_pressed()
 
-        # プレイヤーの更新と描画
-        if keys[pg.K_a]:  # Aキーで左に移動
+        # プレイヤーの移動
+        if keys[pg.K_a]:
             self.player.rect.x -= 5
-        if keys[pg.K_d]:  # Dキーで右に移動
+        if keys[pg.K_d]:
             self.player.rect.x += 5
 
-        self.player.draw(self.screen)
-
-        # 弾を発射するタイミングの管理（連射の間隔チェック）
+        # 弾の発射（連射可能）
         current_time = pg.time.get_ticks()
-        if keys[pg.K_p] and current_time - self.last_shot_time > self.shoot_interval:
-            bullet = Bullet(self.bullet_img_path)
-            bullet.shoot(self.player.rect)
-            self.bullets.append(bullet)
-            self.last_shot_time = current_time
+        if keys[pg.K_p] and current_time - self.last_shot_time > self.shot_interval:
+            self.bullet.shoot(self.player.rect)
+            self.last_shot_time = current_time  # 最後の発射時間を更新
 
-        # 発射された弾の更新と描画
-        for bullet in self.bullets[:]:  # bulletsのコピーを使ってループ
-            bullet.update()
-            bullet.draw(self.screen)
-            # 弾が画面外に出たら削除
-            if bullet.rect.y < 0:
-                self.bullets.remove(bullet)
+        self.bullet.update()
+
+        # プレイヤーと弾を描画
+        self.player.draw(self.screen)
+        self.bullet.draw(self.screen)
+
+        # 敵の生成タイミングと最大数の制限
+        self.enemy_spawn_timer += pg.time.get_ticks()
+        if self.enemy_spawn_timer > self.enemy_spawn_interval and len(self.enemy.rects) < self.max_enemies:
+            self.enemy.spawn_enemy()  # 敵を生成
+            self.enemy_spawn_timer = 0  # タイマーをリセット
 
         # 敵の更新と描画
-        if self.enemy.update(self.player.rect):
-            self.page = 2  # 衝突したらゲームオーバー
+        self.enemy.update()
         self.enemy.draw(self.screen)
 
-        # 弾と敵の衝突判定
-        for bullet in self.bullets[:]:  # bulletsのコピーを使ってループ
-            for enemy_rect in self.enemy.rects[:]:  # enemy.rectsのコピー
-                if bullet.rect.colliderect(enemy_rect):
-                    self.score += 100
-                    self.enemy.rects.remove(enemy_rect)  # 当たった敵を削除
-                    self.bullets.remove(bullet)  # 当たった弾を削除
-                    break  # 一度に複数の敵に当たらないようにループを終了
-        
-        # 弾とプレイヤーの衝突判定（ゲームオーバー）
-        for bullet in self.bullets:
-            if self.enemy.check_collision(bullet.rect, self.player.rect):
-                self.page = 2  # ゲームオーバー
+        # 当たり判定
+        for enemy_rect in self.enemy.rects:
+            if self.bullet.rect.colliderect(enemy_rect):
+                self.score += 100
+                self.enemy.rects.remove(enemy_rect)  # 当たった敵を削除
+                self.bullet.rect.y = -100
 
-        # スコアの描画
+        # 衝突判定
+        if self.enemy.check_collision(self.bullet.rect, self.player.rect):
+            self.page = 2  # ゲームオーバー
+
+        # スコアを描画
         font = pg.font.Font(None, 40)
         score_text = font.render(f"SCORE: {self.score}", True, pg.Color("WHITE"))
         self.screen.blit(score_text, (20, 20))
 
-    # ゲームオーバー画面の処理
+    # ゲームオーバー画面
     def game_over(self):
         self.screen.fill(pg.Color("NAVY"))
         font = pg.font.Font(None, 150)
@@ -95,18 +96,17 @@ class Game:
             self.page = 1
             self.reset_game()
 
-    # ゲームのリセット処理
+    # ゲームをリセット
     def reset_game(self):
         self.score = 0
-        self.bullets = []  # 弾のリストをリセット
-        self.enemy = Enemy("./image/enemy1.tga")  # 敵を再生成
+        self.bullet.rect.y = -100
+        self.enemy = Enemy("./image/enemy1.tga")
 
-    # メインループ
     def run(self):
         while True:
             pg.display.update()
             pg.time.Clock().tick(60)
-            
+
             self.handle_events()
 
             if self.page == 1:
