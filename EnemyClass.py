@@ -39,16 +39,9 @@ class Enemy:
             screen.blit(self.image, rect)
 
     def check_collision(self, bullet_rect, player_rect):
-        for i in range(len(self.rects) - 1, -1, -1):  # リストを逆順にループ
-            rect = self.rects[i]
-            # プレイヤーと敵の衝突
-            if rect.colliderect(player_rect):
+    # もし敵が弾またはプレイヤーと衝突した場合はTrueを返す
+        for rect in self.rects:
+            if rect.colliderect(bullet_rect) or rect.colliderect(player_rect):
                 return True
-            # 弾丸と敵の衝突
-            if rect.colliderect(bullet_rect):
-                # 敵が弾丸に当たったら削除
-                del self.rects[i]
-                del self.speeds_y[i]
-                return True  # 衝突があればTrueを返す
+        return False
 
-        return False  # 衝突がなければFalseを返す
