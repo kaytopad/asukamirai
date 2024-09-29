@@ -65,6 +65,7 @@ class Game:
             self.player.rect.y = 0
         elif self.player.rect.y > 600 - self.player.rect.width:  # 800は画面幅
             self.player.rect.y = 600 - self.player.rect.width
+        
         # 弾の発射（shoot_bulletメソッドを使用）
         self.shoot_bullet(keys)
         
@@ -81,10 +82,6 @@ class Game:
 
         # 敵の生成タイミングと最大数の制限
         self.enemy_Generate()
-        #self.enemy_spawn_timer += pg.time.get_ticks()
-        #if self.enemy_spawn_timer > self.enemy_spawn_interval and len(self.enemy.rects) < self.max_enemies:
-        #    self.enemy.spawn_enemy()
-        #    self.enemy_spawn_timer = 0
 
         # 敵の更新と描画
         self.enemy.update()
