@@ -38,6 +38,10 @@ class Game:
             self.player.rect.x -= 5
         if keys[pg.K_d]:
             self.player.rect.x += 5
+        if keys[pg.K_w]:
+            self.player.rect.y -= 5
+        if keys[pg.K_s]:
+            self.player.rect.y += 5
 
         # 弾の発射
         current_time = pg.time.get_ticks()
