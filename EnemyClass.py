@@ -31,10 +31,15 @@ class Enemy:
             screen.blit(self.image, rect)
 
     def check_collision(self, bullet_rects, player_rect):
+        #""" 弾またはプレイヤーとの衝突を確認するメソッド """
         for rect in self.rects:
+            # 弾との衝突をチェック
             for bullet_rect in bullet_rects:
                 if rect.colliderect(bullet_rect):
-                    return True, rect
+                    return True, rect  # 弾に衝突した敵の矩形を返す
+            
+            # プレイヤーとの衝突をチェック
             if rect.colliderect(player_rect):
-                return True, rect
-        return False, None
+                return True, None  # プレイヤーに衝突した場合、Noneを返す
+
+        return False, None  # 衝突がない場合
