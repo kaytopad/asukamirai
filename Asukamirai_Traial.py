@@ -7,4 +7,3 @@ screen = pg.display.set_mode((800, 600))
 if __name__ == "__main__":
     game = Game(screen)
     game.run()
-    

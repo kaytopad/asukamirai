@@ -55,8 +55,16 @@ class Game:
             self.player.rect.y -= 5
         if keys[pg.K_s]:
             self.player.rect.y += 5
+        
+        if self.player.rect.x < 0:
+            self.player.rect.x = 0
+        elif self.player.rect.x > 800 - self.player.rect.width:  # 800は画面幅
+            self.player.rect.x = 800 - self.player.rect.width
 
-        # 弾の発射
+        if self.player.rect.y < 0:
+            self.player.rect.y = 0
+        elif self.player.rect.y > 600 - self.player.rect.width:  # 800は画面幅
+            self.player.rect.y = 600 - self.player.rect.width
         # 弾の発射（shoot_bulletメソッドを使用）
         self.shoot_bullet(keys)
         
@@ -118,6 +126,9 @@ class Game:
         self.score = 0
         self.bullets.clear()  # 弾リストをクリア
         self.enemy = Enemy("./image/enemy1.tga")
+        self.player.rect.x = 350
+        self.player.rect.y = 800
+        
 
     def run(self):
         while True:
