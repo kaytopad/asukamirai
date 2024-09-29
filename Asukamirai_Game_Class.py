@@ -28,6 +28,19 @@ class Game:
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
+    def shoot_bullet(self, keys):
+        """ 弾を発射する処理をメソッドにまとめる """
+        current_time = pg.time.get_ticks()
+        if keys[pg.K_p] and current_time - self.last_shot_time > self.shot_interval:
+            bullet = Bullet(self.bullet_image_path)  # 新しい弾を生成
+            bullet.shoot(self.player.rect)
+            self.bullets.append(bullet)  # リストに追加
+            self.last_shot_time = current_time
+    def enemy_Generate(self):
+        self.enemy_spawn_timer += pg.time.get_ticks()
+        if self.enemy_spawn_timer > self.enemy_spawn_interval and len(self.enemy.rects) < self.max_enemies:
+            self.enemy.spawn_enemy()
+            self.enemy_spawn_timer = 0
 
     def game_stage(self):
         self.screen.fill(pg.Color("BLACK"))
@@ -44,13 +57,9 @@ class Game:
             self.player.rect.y += 5
 
         # 弾の発射
-        current_time = pg.time.get_ticks()
-        if keys[pg.K_p] and current_time - self.last_shot_time > self.shot_interval:
-            bullet = Bullet(self.bullet_image_path)  # 新しい弾を生成
-            bullet.shoot(self.player.rect)
-            self.bullets.append(bullet)  # リストに追加
-            self.last_shot_time = current_time
-
+        # 弾の発射（shoot_bulletメソッドを使用）
+        self.shoot_bullet(keys)
+        
         # 弾の更新と描画
         for bullet in self.bullets[:]:
             bullet.update()
@@ -63,10 +72,11 @@ class Game:
             bullet.draw(self.screen)
 
         # 敵の生成タイミングと最大数の制限
-        self.enemy_spawn_timer += pg.time.get_ticks()
-        if self.enemy_spawn_timer > self.enemy_spawn_interval and len(self.enemy.rects) < self.max_enemies:
-            self.enemy.spawn_enemy()
-            self.enemy_spawn_timer = 0
+        self.enemy_Generate()
+        #self.enemy_spawn_timer += pg.time.get_ticks()
+        #if self.enemy_spawn_timer > self.enemy_spawn_interval and len(self.enemy.rects) < self.max_enemies:
+        #    self.enemy.spawn_enemy()
+        #    self.enemy_spawn_timer = 0
 
         # 敵の更新と描画
         self.enemy.update()
